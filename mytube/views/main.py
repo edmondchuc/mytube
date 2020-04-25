@@ -11,10 +11,14 @@ from mytube.extensions import videos, allowed_uploads
 main_routes = Blueprint('main_routes', __name__)
 
 
-@main_routes.route('/')
+@main_routes.route('/', methods=['GET', 'POST'])
 def home():
+    search = request.form.get('search')
     user = get_user()
-    videos = Video.query.order_by(Video.upload_datetime.desc()).all()
+    if search:
+        videos = Video.query.filter(Video.title.contains(search))
+    else:
+        videos = Video.query.order_by(Video.upload_datetime.desc()).all()
 
     return render_template('main/home/index.html', user=user, videos=videos)
 
